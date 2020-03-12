@@ -1,11 +1,11 @@
 package ee.suveulikool.netgroup.demo.controller;
 
+import ee.suveulikool.netgroup.demo.api.request.PersonRequestDto;
 import ee.suveulikool.netgroup.demo.domain.Person;
+import ee.suveulikool.netgroup.demo.exception.PersonExistsException;
 import ee.suveulikool.netgroup.demo.exception.PersonNotFoundException;
 import ee.suveulikool.netgroup.demo.service.PersonService;
 import ee.suveulikool.netgroup.demo.service.PersonServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +16,6 @@ import java.util.List;
 @RequestMapping("/api/v1/person")
 public class PersonController {
 
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
-
-
     private PersonService personService;
 
     public PersonController(PersonServiceImpl personService) {
@@ -26,16 +23,27 @@ public class PersonController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping(path = "/get/{name}")
-    public List<Person> getHome(@PathVariable("name") String name) throws PersonNotFoundException {
-        LOG.info("Getting person with name {}", name);
+    @GetMapping(path = "/{name}")
+    public List<Person> getPerson(@PathVariable("name") String name) {
+        return personService.getPersonByName(name);
+    }
 
-        try { // handle people with multiple names. Right now select first
-            return personService.getPersonByName(name);
-        } catch (Exception e) {
-            throw new PersonNotFoundException(String.format("Person with name: %s was not found!", name));
-        }
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping(path = "")
+    public void updatePerson(@RequestBody PersonRequestDto requestDto) throws PersonNotFoundException, PersonExistsException {
+        personService.updatePerson(requestDto);
+    }
 
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(path = "")
+    public void createPerson(@RequestBody PersonRequestDto requestDto) throws PersonNotFoundException, PersonExistsException {
+        personService.createPerson(requestDto);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping(path = "")
+    public void deletePerson(@RequestBody PersonRequestDto requestDto) throws PersonNotFoundException {
+        personService.deletePerson(requestDto);
     }
 
 }

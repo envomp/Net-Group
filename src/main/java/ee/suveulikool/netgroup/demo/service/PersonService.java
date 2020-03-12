@@ -1,7 +1,10 @@
 package ee.suveulikool.netgroup.demo.service;
 
+import ee.suveulikool.netgroup.demo.api.request.PersonRequestDto;
 import ee.suveulikool.netgroup.demo.domain.Person;
+import ee.suveulikool.netgroup.demo.exception.PersonExistsException;
 import ee.suveulikool.netgroup.demo.exception.PersonIsCutException;
+import ee.suveulikool.netgroup.demo.exception.PersonNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,5 +24,16 @@ public interface PersonService {
 
     void putAll(List<Person> people) throws PersonIsCutException;
 
-    void putPerson(Person person) throws PersonIsCutException;
+    void updatePerson(Person person) throws PersonIsCutException, PersonNotFoundException;
+
+    void updatePerson(PersonRequestDto person) throws PersonExistsException, PersonNotFoundException;
+
+    void createPerson(Person person) throws PersonIsCutException, PersonExistsException;
+
+    void createPerson(PersonRequestDto person) throws PersonExistsException, PersonNotFoundException;
+
+    void deletePerson(Person person) throws PersonNotFoundException;
+
+    void deletePerson(PersonRequestDto person) throws PersonNotFoundException;
+
 }

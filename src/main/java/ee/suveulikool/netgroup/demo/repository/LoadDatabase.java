@@ -59,7 +59,7 @@ class LoadDatabase {
         return args -> {
 
             addRelations(child, father, mother, aunt, grand_mother);
-            personServiceImpl.putPerson(child);
+            personServiceImpl.createPerson(child);
 
         };
     }
