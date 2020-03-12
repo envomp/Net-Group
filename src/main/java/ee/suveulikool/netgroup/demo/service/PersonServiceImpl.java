@@ -89,15 +89,6 @@ public class PersonServiceImpl implements PersonService {
         return person;
     }
 
-    public void putAll(List<Person> people) throws PersonIsCutException {
-        if (people.stream().anyMatch(Person::isCut)) {
-            throw new PersonIsCutException("Cant save a person who's cut!");
-        }
-
-        personRepository.saveAll(people);
-        personRepository.flush();
-    }
-
     @Override
     public void updatePerson(Person person) throws PersonIsCutException, PersonNotFoundException {
         LOG.info("Updating person with name {}", person.getName());

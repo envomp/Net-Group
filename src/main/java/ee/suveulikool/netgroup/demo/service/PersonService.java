@@ -22,8 +22,6 @@ public interface PersonService {
 
     Optional<Person> getPersonByCountryCodeAndIDCode(String county_code, String id_code);
 
-    void putAll(List<Person> people) throws PersonIsCutException;
-
     void updatePerson(Person person) throws PersonIsCutException, PersonNotFoundException;
 
     void updatePerson(PersonRequestDto person) throws PersonExistsException, PersonNotFoundException;

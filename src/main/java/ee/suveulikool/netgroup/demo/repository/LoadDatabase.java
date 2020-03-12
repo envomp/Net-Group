@@ -58,8 +58,19 @@ class LoadDatabase {
 
         return args -> {
 
-            addRelations(child, father, mother, aunt, grand_mother);
             personServiceImpl.createPerson(child);
+            personServiceImpl.createPerson(father);
+            personServiceImpl.createPerson(mother);
+            personServiceImpl.createPerson(aunt);
+            personServiceImpl.createPerson(grand_mother);
+
+            addRelations(child, father, mother, aunt, grand_mother);
+
+            personServiceImpl.updatePerson(child);
+            personServiceImpl.updatePerson(father);
+            personServiceImpl.updatePerson(mother);
+            personServiceImpl.updatePerson(aunt);
+            personServiceImpl.updatePerson(grand_mother);
 
         };
     }

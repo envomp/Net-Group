@@ -1,5 +1,6 @@
 package ee.suveulikool.netgroup.demo;
 
+import ee.suveulikool.netgroup.demo.api.request.PersonDto;
 import ee.suveulikool.netgroup.demo.api.request.PersonRequestDto;
 import ee.suveulikool.netgroup.demo.domain.Person;
 import io.restassured.RestAssured;
@@ -13,6 +14,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
@@ -29,20 +33,61 @@ public class PersonControllerTests {
     @LocalServerPort
     private int port;
 
+    PersonRequestDto person;
+
+    PersonRequestDto relationshipBuddy;
+
+    PersonDto relationshipBuddyDto;
+
     @Before
     public void init() {
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = port;
-    }
 
-    @Test
-    public void putPersonThenUpdateThenGetPersonByNameReturnsPerson() {
+        relationshipBuddy = PersonRequestDto.builder()
+                .name("Test Relationship Buddy")
+                .countryCode("EST")
+                .idCode("429232411j5")
+                .build();
 
-        PersonRequestDto person = PersonRequestDto.builder()
+        relationshipBuddyDto = PersonDto.builder()
+                .idCode("429232411j5")
+                .countryCode("EST")
+                .build();
+
+        person = PersonRequestDto.builder()
                 .name("Test")
                 .countryCode("EST")
                 .idCode("49h8g64yj5")
+                .children(new ArrayList<>(List.of(relationshipBuddyDto)))
                 .build();
+    }
+
+    @Test
+    public void stage1_GetNoResults() {
+
+        Person[] people = given()
+                .when()
+                .get("api/v1/person/Test")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK))
+                .extract()
+                .body()
+                .as(Person[].class);
+
+        assert people.length == 0;
+    }
+
+    @Test
+    public void stage2_PostAndResultsExist() {
+
+        given()
+                .when()
+                .body(relationshipBuddy)
+                .contentType("application/json")
+                .post("api/v1/person")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK));
 
         given()
                 .when()
@@ -52,6 +97,22 @@ public class PersonControllerTests {
                 .then()
                 .statusCode(is(HttpStatus.SC_OK));
 
+        Person[] people = given()
+                .when()
+                .get("api/v1/person/Test")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK))
+                .extract()
+                .body()
+                .as(Person[].class);
+
+        assert people.length != 0;
+        assert people[0].getName().equals("Test");
+        assert people[0].getChildren().get(0).getName().equals("Test Relationship Buddy");
+    }
+
+    @Test
+    public void stage3_PutAndResultsExist() {
         person.setName("New Name");
 
         given()
@@ -62,7 +123,7 @@ public class PersonControllerTests {
                 .then()
                 .statusCode(is(HttpStatus.SC_OK));
 
-        Person[] people = given()
+        Person[] new_people = given()
                 .when()
                 .get("api/v1/person/New Name")
                 .then()
@@ -71,8 +132,73 @@ public class PersonControllerTests {
                 .body()
                 .as(Person[].class);
 
+        assert new_people.length != 0;
+        assert new_people[0].getName().equals("New Name");
+    }
+
+    @Test
+    public void stage4_DeleteAndGetNoResults() {
+
+        given()
+                .when()
+                .body(person)
+                .contentType("application/json")
+                .delete("api/v1/person")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK));
+
+        Person[] no_people = given()
+                .when()
+                .get("api/v1/person/New Name")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK))
+                .extract()
+                .body()
+                .as(Person[].class);
+
+        assert no_people.length == 0;
+
+    }
+
+    @Test
+    public void stage6_GetNotCascaded() {
+
+        Person[] people = given()
+                .when()
+                .get("api/v1/person/Test Relationship Buddy")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK))
+                .extract()
+                .body()
+                .as(Person[].class);
+
         assert people.length != 0;
-        assert people[0].getName().equals("New Name");
+        assert people[0].getName().equals("Test Relationship Buddy");
+        assert people[0].getChildren().isEmpty();
+        assert people[0].getParents().isEmpty();
+    }
+
+    @Test
+    public void stage7_DeleteAndGetNoResults() {
+
+        given()
+                .when()
+                .body(relationshipBuddy)
+                .contentType("application/json")
+                .delete("api/v1/person")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK));
+
+        Person[] no_people = given()
+                .when()
+                .get("api/v1/person/Test Relationship Buddy")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK))
+                .extract()
+                .body()
+                .as(Person[].class);
+
+        assert no_people.length == 0;
 
     }
 

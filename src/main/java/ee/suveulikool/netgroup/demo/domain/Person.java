@@ -33,11 +33,11 @@ public class Person {
     private String idCode;
 
     @Builder.Default
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.DETACH)
     private List<Person> parents = new ArrayList<>();
 
     @Builder.Default
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.DETACH)
     private List<Person> children = new ArrayList<>();
 
     @NotNull
