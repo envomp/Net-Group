@@ -180,15 +180,15 @@ public class Person {
     }
 
     public Boolean isAncestor(Person root) {
-        return PersonUtils.isAncestor(this, root, 10);
+        return PersonUtils.isAncestor(this, root, 9);
     }
 
     public Boolean isBloodRelated(Person person) {
-        return PersonUtils.IsRelative(this, person, 3);
+        return PersonUtils.IsRelative(this, person, 2); // 12.5%
     }
 
     public Boolean isDistantlyBloodRelated(Person person) {
-        return PersonUtils.IsRelative(this, person, 10);
+        return PersonUtils.IsRelative(this, person, 9); // 0.1%
     }
 
 }

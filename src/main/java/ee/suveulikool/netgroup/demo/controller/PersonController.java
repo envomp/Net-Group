@@ -4,6 +4,7 @@ import ee.suveulikool.netgroup.demo.api.request.PersonRequestDto;
 import ee.suveulikool.netgroup.demo.domain.Person;
 import ee.suveulikool.netgroup.demo.exception.PersonExistsException;
 import ee.suveulikool.netgroup.demo.exception.PersonNotFoundException;
+import ee.suveulikool.netgroup.demo.exception.PersonValidationException;
 import ee.suveulikool.netgroup.demo.service.PersonService;
 import ee.suveulikool.netgroup.demo.service.PersonServiceImpl;
 import org.springframework.http.HttpStatus;
@@ -44,13 +45,13 @@ public class PersonController {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(path = "")
-    public void updatePerson(@RequestBody PersonRequestDto requestDto) throws PersonNotFoundException, PersonExistsException {
+    public void updatePerson(@RequestBody PersonRequestDto requestDto) throws PersonNotFoundException, PersonExistsException, PersonValidationException {
         personService.updatePerson(requestDto);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(path = "")
-    public void createPerson(@RequestBody PersonRequestDto requestDto) throws PersonNotFoundException, PersonExistsException {
+    public void createPerson(@RequestBody PersonRequestDto requestDto) throws PersonNotFoundException, PersonExistsException, PersonValidationException {
         personService.createPerson(requestDto);
     }
 

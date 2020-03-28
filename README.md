@@ -21,9 +21,9 @@ Task: Family tree
 ### Validation rules
 
 * Person can not be cut. (Person is cut when he took part in graph to tree modification)
-* Persons birth date can't be in the future
-* Persons death date can't be after death date
-* Persons birth date can't be before after parents birth date
+* Persons birth date can not be in the future
+* Persons death date can not be after death date
+* Persons birth date can not be before parents birth date
 * Persons country code must be in ALPHA-3 format, matching regex "^[A-Z]{3}$" and can not be NULL
 * Persons id code must be in correct format, matching regex "^[0-9]{8,20}$" and can not be NULL
 * Persons name must be in correct format, matching regex "^[A-Z][-a-z]+( [A-Z][-a-z]+)+$" and be at least 5 characters long and can not be NULL

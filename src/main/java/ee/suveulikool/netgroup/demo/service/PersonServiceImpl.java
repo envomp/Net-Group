@@ -133,7 +133,7 @@ public class PersonServiceImpl implements PersonService {
 
         Optional<Person> personOptional = personRepository.findByCountryCodeAndIdCode(personDto.getCountryCode(), personDto.getIdCode());
         if (personOptional.isPresent()) {
-            throw new PersonExistsException("Person seems to be in db already. Try using Post method instead.");
+            throw new PersonExistsException("Person seems to be in db already. Try using Put method instead.");
         }
 
         Person person = Person.builder()

@@ -19,10 +19,4 @@ public class QueuePerson {
 
     private Person origin;
 
-    private Direction direction;
-
-    public enum Direction {
-        UP,
-        DOWN
-    }
 }
