@@ -9,6 +9,7 @@ import ee.suveulikool.netgroup.demo.exception.PersonExistsException;
 import ee.suveulikool.netgroup.demo.exception.PersonIsCutException;
 import ee.suveulikool.netgroup.demo.exception.PersonNotFoundException;
 import ee.suveulikool.netgroup.demo.repository.PersonRepository;
+import ee.suveulikool.netgroup.demo.utils.PersonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,62 +31,25 @@ public class PersonServiceImpl implements PersonService {
         this.personRepository = personRepository;
     }
 
+    @Override
+    public List<Person> getPeople() {
+        return personRepository.findTop500ByOrderByIdDesc()
+                .stream()
+                .map(x -> standardisePerson(x, 1))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<Person> getPersonByName(String name) {
         LOG.info("Getting person with name {}", name);
         return personRepository.findByName(name)
                 .stream()
-                .map(this::constructATreeWithPersonAsRoot)
+                .map(x -> standardisePerson(x, 10))
                 .collect(Collectors.toList());
     }
 
-    public Person constructATreeWithPersonAsRoot(Person person) {
-        LinkedList<QueuePerson> queue = new LinkedList<>();
-        queue.add(QueuePerson.builder().person(person).build());
-        QueuePerson origin;
-
-        while (queue.size() != 0) {
-            origin = queue.poll();
-            origin.getPerson().setCut(true);
-
-            if (origin.getDepth() != 0) { // break condition
-
-                for (Person child : origin.getPerson().getChildren()) {
-                    if (!child.isCut()) {
-                        queue.add(QueuePerson.builder()
-                                .depth(origin.getDepth() - 1)
-                                .person(child)
-                                .origin(origin.getPerson())
-                                .direction(QueuePerson.Direction.UP)
-                                .build());
-                    }
-                }
-
-                for (Person parent : origin.getPerson().getParents()) {
-                    if (!parent.isCut()) {
-                        queue.add(QueuePerson.builder()
-                                .depth(origin.getDepth() - 1)
-                                .person(parent)
-                                .origin(origin.getPerson())
-                                .direction(QueuePerson.Direction.DOWN)
-                                .build());
-                    }
-                }
-
-            } else {
-                origin.getPerson().setParents(new ArrayList<>());
-                origin.getPerson().setChildren(new ArrayList<>());
-            }
-
-
-            if (origin.getOrigin() != null) {
-                if (origin.getDirection() == QueuePerson.Direction.UP) {
-                    origin.getPerson().getParents().remove(origin.getOrigin());
-                } else {
-                    origin.getPerson().getChildren().remove(origin.getOrigin());
-                }
-            }
-        }
-
+    public Person standardisePerson(Person person, int depth) {
+        PersonUtils.generateTreeWithPersonAsRoot(person, depth);
         return person;
     }
 
@@ -119,6 +83,10 @@ public class PersonServiceImpl implements PersonService {
 
         if (personDto.getBirthDate() != null) {
             person.setBirthDate(personDto.getBirthDate());
+        }
+
+        if (personDto.getBirthDate() != null) {
+            person.setDeathDate(personDto.getDeathDate());
         }
 
         if (personDto.getCountryCode() != null) {
@@ -170,6 +138,7 @@ public class PersonServiceImpl implements PersonService {
 
         Person person = Person.builder()
                 .birthDate(personDto.getBirthDate())
+                .deathDate(personDto.getDeathDate())
                 .countryCode(personDto.getCountryCode())
                 .gender(personDto.getGender())
                 .idCode(personDto.getIdCode())
@@ -194,16 +163,16 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public void deletePerson(PersonRequestDto personDto) throws PersonNotFoundException {
-        LOG.info("Deleting person with name {}", personDto.getName());
+    public void deletePersonByCountryCodeAndIDCode(String countryCode, String idCode) throws PersonNotFoundException {
+        LOG.info("Deleting person with country code {} and id code {}", countryCode, idCode);
 
-        Optional<Person> personOptional = personRepository.findByCountryCodeAndIdCode(personDto.getCountryCode(), personDto.getIdCode());
+        Optional<Person> personOptional = personRepository.findByCountryCodeAndIdCode(countryCode, idCode);
 
         if (personOptional.isEmpty()) {
             throw new PersonNotFoundException("Can't find the person from db to delete it.");
         }
 
-        personRepository.delete(personOptional.get());
+        personRepository.deleteById(personOptional.get().getId());
 
     }
 
@@ -231,9 +200,9 @@ public class PersonServiceImpl implements PersonService {
         }
     }
 
+    @Override
     public Optional<Person> getPersonByCountryCodeAndIDCode(String county_code, String id_code) {
         Optional<Person> person = personRepository.findByCountryCodeAndIdCode(county_code, id_code);
-        return person.map(this::constructATreeWithPersonAsRoot);
-
+        return person.map(x -> standardisePerson(x, 10));
     }
 }

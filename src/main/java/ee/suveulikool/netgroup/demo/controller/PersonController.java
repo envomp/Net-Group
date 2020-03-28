@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -29,6 +30,19 @@ public class PersonController {
     }
 
     @ResponseStatus(HttpStatus.OK)
+    @GetMapping(path = "/{countryCode}/{idCode}")
+    public Optional<Person> getPerson(@PathVariable String countryCode, @PathVariable String idCode) {
+        return personService.getPersonByCountryCodeAndIDCode(countryCode, idCode);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping(path = "/all")
+    public List<Person> getPeople() {
+        return personService.getPeople();
+    }
+
+
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping(path = "")
     public void updatePerson(@RequestBody PersonRequestDto requestDto) throws PersonNotFoundException, PersonExistsException {
         personService.updatePerson(requestDto);
@@ -41,9 +55,9 @@ public class PersonController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping(path = "")
-    public void deletePerson(@RequestBody PersonRequestDto requestDto) throws PersonNotFoundException {
-        personService.deletePerson(requestDto);
+    @DeleteMapping(path = "/{countryCode}/{idCode}")
+    public void deletePerson(@PathVariable String countryCode, @PathVariable String idCode) throws PersonNotFoundException {
+        personService.deletePersonByCountryCodeAndIDCode(countryCode, idCode);
     }
 
 }

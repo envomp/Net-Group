@@ -47,18 +47,18 @@ public class PersonControllerTests {
         relationshipBuddy = PersonRequestDto.builder()
                 .name("Test Relationship Buddy")
                 .countryCode("EST")
-                .idCode("429232411j5")
+                .idCode("429232416575")
                 .build();
 
         relationshipBuddyDto = PersonDto.builder()
-                .idCode("429232411j5")
+                .idCode("429232416575")
                 .countryCode("EST")
                 .build();
 
         person = PersonRequestDto.builder()
-                .name("Test")
+                .name("Test Person")
                 .countryCode("EST")
-                .idCode("49h8g64yj5")
+                .idCode("49890760455")
                 .children(new ArrayList<>(List.of(relationshipBuddyDto)))
                 .build();
     }
@@ -99,7 +99,7 @@ public class PersonControllerTests {
 
         Person[] people = given()
                 .when()
-                .get("api/v1/person/Test")
+                .get("api/v1/person/Test Person")
                 .then()
                 .statusCode(is(HttpStatus.SC_OK))
                 .extract()
@@ -107,7 +107,7 @@ public class PersonControllerTests {
                 .as(Person[].class);
 
         assert people.length != 0;
-        assert people[0].getName().equals("Test");
+        assert people[0].getName().equals("Test Person");
         assert people[0].getChildren().get(0).getName().equals("Test Relationship Buddy");
     }
 
@@ -141,9 +141,8 @@ public class PersonControllerTests {
 
         given()
                 .when()
-                .body(person)
                 .contentType("application/json")
-                .delete("api/v1/person")
+                .delete("api/v1/person/EST/49890760455")
                 .then()
                 .statusCode(is(HttpStatus.SC_OK));
 
@@ -183,9 +182,8 @@ public class PersonControllerTests {
 
         given()
                 .when()
-                .body(relationshipBuddy)
                 .contentType("application/json")
-                .delete("api/v1/person")
+                .delete("api/v1/person/EST/429232416575")
                 .then()
                 .statusCode(is(HttpStatus.SC_OK));
 

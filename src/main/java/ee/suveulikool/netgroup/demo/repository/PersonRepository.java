@@ -11,6 +11,8 @@ import java.util.Optional;
 @Repository
 public interface PersonRepository extends JpaRepository<Person, Long> {
 
+    List<Person> findTop500ByOrderByIdDesc();
+
     List<Person> findByName(@Param("name") String name);
 
     Optional<Person> findByCountryCodeAndIdCode(@Param("country_code") String country_code, @Param("id_code") String id_code);
