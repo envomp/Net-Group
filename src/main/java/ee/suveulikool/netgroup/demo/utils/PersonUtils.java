@@ -11,37 +11,32 @@ public class PersonUtils {
     public static void generateTreeWithPersonAsRoot(Person person, int depth) {
         LinkedList<QueuePerson> queue = new LinkedList<>();
         queue.add(QueuePerson.builder().depth(depth).person(person).build());
-        modifyOrigin(person); // cut the root
+        modifyOrigin(person);
         QueuePerson origin; // BFS queue
 
         while (queue.size() != 0) {
             origin = queue.poll();
+            modifyOrigin(origin.getPerson()); // Reason in modifying it here is because of concurrency.
 
             if (origin.getDepth() != 0) {
 
-                for (Person child : origin.getPerson().getChildren()) { // expand down
-                    if (!child.isCut()) { // O(n) complexity check here - stop infinite loops from happening
-                        QueuePerson queuePerson =
-                                QueuePerson.builder()
-                                        .depth(origin.getDepth() - 1)
-                                        .person(child)
-                                        .origin(origin.getPerson())
-                                        .build();
-                        modifyOrigin(child);  // cut the n + 1 element
-                        queue.add(queuePerson); // BFS search
+                for (Person child : origin.getPerson().getChildren()) {
+                    if (!child.isCut()) {
+                        queue.add(QueuePerson.builder()
+                                .depth(origin.getDepth() - 1)
+                                .person(child)
+                                .origin(origin.getPerson())
+                                .build());
                     }
                 }
 
-                for (Person parent : origin.getPerson().getParents()) { // expand up
-                    if (!parent.isCut()) { // O(n) complexity check here - stop infinite loops from happening
-                        QueuePerson queuePerson =
-                                QueuePerson.builder()
-                                        .depth(origin.getDepth() - 1)
-                                        .person(parent)
-                                        .origin(origin.getPerson())
-                                        .build();
-                        modifyOrigin(parent); // cut the n + 1 element
-                        queue.add(queuePerson); // BFS search
+                for (Person parent : origin.getPerson().getParents()) {
+                    if (!parent.isCut()) {
+                        queue.add(QueuePerson.builder()
+                                .depth(origin.getDepth() - 1)
+                                .person(parent)
+                                .origin(origin.getPerson())
+                                .build());
                     }
                 }
 
@@ -117,17 +112,17 @@ public class PersonUtils {
         root.setCut(true); // stop infinite loop
         boolean answer = false;
 
-        for (Person parent : root.getParents()) { // check up recursively
+        for (Person parent : root.getParents()) {
             if (isInATree(parent, person, false, depth)) {
-                answer = true; // answer Found
+                answer = true;
                 break;
             }
         }
 
         if (!answer) { // no need to keep looking
-            for (Person child : root.getChildren()) {  // check down recursively
+            for (Person child : root.getChildren()) {
                 if (isInATree(child, person, true, depth)) {
-                    answer = true; // answer Found
+                    answer = true;
                     break;
                 }
             }
