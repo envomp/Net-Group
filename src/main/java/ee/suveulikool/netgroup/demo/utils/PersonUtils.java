@@ -20,7 +20,7 @@ public class PersonUtils {
 
             if (origin.getDepth() != 0) {
 
-                for (Person child : origin.getPerson().getChildren()) {
+                for (Person child : origin.getPerson().getChildren()) { // breadth first search
                     if (!child.isCut()) {
                         queue.add(QueuePerson.builder()
                                 .depth(origin.getDepth() - 1)
@@ -30,7 +30,7 @@ public class PersonUtils {
                     }
                 }
 
-                for (Person parent : origin.getPerson().getParents()) {
+                for (Person parent : origin.getPerson().getParents()) { // breadth first search
                     if (!parent.isCut()) {
                         queue.add(QueuePerson.builder()
                                 .depth(origin.getDepth() - 1)
@@ -47,8 +47,8 @@ public class PersonUtils {
         }
     }
 
-    private static void leafify(Person finalOrigin) {
-        finalOrigin.getParents().stream().filter(x -> !x.isCut())
+    private static void leafify(Person finalOrigin) { // create a leaf from a node. Meaning. Only 1 possible route to
+        finalOrigin.getParents().stream().filter(x -> !x.isCut()) // get to the given leaf
                 .forEach(x -> x.getChildren().remove(finalOrigin));
         finalOrigin.setParents(new ArrayList<>());
         finalOrigin.getChildren().stream().filter(x -> !x.isCut())
@@ -58,19 +58,19 @@ public class PersonUtils {
 
     public static void generateTreeWithPersonAsRoot(Person person, int depth) {
         if (depth == 0) {
-            leafify(person);
+            leafify(person); // Too deep
             return;
         }
         for (Person parent : person.getParents()) {
-            generateTreeWithPersonAsRoot(parent, depth - 1);
-            for (Person child : parent.getChildren()) {
+            generateTreeWithPersonAsRoot(parent, depth - 1); // depth first recursion
+            for (Person child : parent.getChildren()) { // branch
                 if (person != child) {
                     child.setCut(true);
-                    child.getParents().remove(parent);
+                    child.getParents().remove(parent); // and cut
                 }
             }
             parent.setCut(true);
-            parent.setChildren(new ArrayList<>());
+            parent.setChildren(new ArrayList<>()); // and stop infinite loops
         }
     }
 
@@ -176,7 +176,7 @@ public class PersonUtils {
     }
 
     public static Boolean isPotentialUncleOrAunt(Person person) {
-        for (Person parent : person.getParents()) {
+        for (Person parent : person.getParents()) { // uncle or aunt is someone who's sibling has a child
             for (Person child : parent.getChildren()) {
                 for (Person grand : child.getChildren()) {
                     return true;

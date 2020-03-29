@@ -1,39 +1,25 @@
 package ee.suveulikool.netgroup.demo.controller;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ErrorModel {
 
     private HttpStatus httpStatus;
-
     private LocalDateTime timestamp;
-
     private String message;
-
     private String details;
 
-    public ErrorModel(HttpStatus httpStatus, String message, String details) {
-        this.httpStatus = httpStatus;
-        this.timestamp = LocalDateTime.now();
-        this.message = message;
+    public ErrorModel(HttpStatus status, String details, String message) {
+        this.httpStatus = status;
         this.details = details;
-    }
-
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getDetails() {
-        return details;
+        this.message = message;
     }
 }

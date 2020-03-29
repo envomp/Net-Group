@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestControllerAdvice
-public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestExceptionHandler extends ResponseEntityExceptionHandler { // Make server return 40x and 50x respectively
 
     @ExceptionHandler(PersonExistsException.class)
     private ResponseEntity<ErrorModel> handlePersonExistsException(PersonExistsException ex) {
@@ -22,7 +22,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(PersonIsCutException.class)
     private ResponseEntity<ErrorModel> handlePersonIsCutException(PersonIsCutException ex) {
         ErrorModel error = new ErrorModel(HttpStatus.INTERNAL_SERVER_ERROR, "Server failed with in place modification", ex.getMessage());
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR); // never should actually get here
     }
 
     @ExceptionHandler(PersonNotFoundException.class)

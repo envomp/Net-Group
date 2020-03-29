@@ -137,7 +137,93 @@ public class PersonControllerTests {
     }
 
     @Test
-    public void stage4_DeleteAndGetNoResults() {
+    public void stage4_GetTree() {
+
+        Person people = given()
+                .when()
+                .get("api/v1/person/tree/EST/49890760455")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK))
+                .extract()
+                .body()
+                .as(Person.class);
+
+        assert people.getChildren().size() == 0;
+        assert people.getParents().size() == 0;
+
+        Person person2 = given()
+                .when()
+                .get("api/v1/person/tree/EST/429232416575")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK))
+                .extract()
+                .body()
+                .as(Person.class);
+
+        assert person2.getChildren().size() == 0;
+        assert person2.getParents().size() == 1;
+
+    }
+
+    @Test
+    public void stage5_GetGraph() {
+
+        Person people = given()
+                .when()
+                .get("api/v1/person/EST/49890760455")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK))
+                .extract()
+                .body()
+                .as(Person.class);
+
+        assert people.getChildren().size() == 1;
+        assert people.getChildren().get(0).getParents().size() == 0;
+        assert people.getParents().size() == 0;
+
+        Person person2 = given()
+                .when()
+                .get("api/v1/person/EST/429232416575")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK))
+                .extract()
+                .body()
+                .as(Person.class);
+
+        assert person2.getChildren().size() == 0;
+        assert person2.getParents().size() == 1;
+        assert person2.getParents().get(0).getChildren().size() == 0;
+
+    }
+
+    @Test
+    public void stage6_GetPeople() {
+
+        Person[] people = given()
+                .when()
+                .get("api/v1/person/all")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK))
+                .extract()
+                .body()
+                .as(Person[].class);
+
+        assert people.length == 3 + 6; // 6 existed before
+
+        Person person2 = given()
+                .when()
+                .get("api/v1/person/youngest/auntOrUncle")
+                .then()
+                .statusCode(is(HttpStatus.SC_OK))
+                .extract()
+                .body()
+                .as(Person.class);
+
+        assert person2 != null; //There's this aunt
+    }
+
+    @Test
+    public void stage7_DeleteAndGetNoResults() {
 
         given()
                 .when()
@@ -160,7 +246,7 @@ public class PersonControllerTests {
     }
 
     @Test
-    public void stage6_GetNotCascaded() {
+    public void stage8_GetNotCascaded() {
 
         Person[] people = given()
                 .when()
@@ -178,7 +264,7 @@ public class PersonControllerTests {
     }
 
     @Test
-    public void stage7_DeleteAndGetNoResults() {
+    public void stage9_DeleteAndGetNoResults() {
 
         given()
                 .when()

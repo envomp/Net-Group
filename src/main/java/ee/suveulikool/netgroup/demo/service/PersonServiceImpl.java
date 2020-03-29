@@ -84,7 +84,7 @@ public class PersonServiceImpl implements PersonService {
         Optional<Person> personOptional = personRepository.findByCountryCodeAndIdCode(countryCode, idCode);
 
         if (personOptional.isEmpty()) {
-            throw new PersonNotFoundException("Can't find the person from db. Try using Put method instead.");
+            throw new PersonNotFoundException("Can't find the person from db. Try using Post method instead.");
         }
 
         Person person = personOptional.get();
@@ -140,8 +140,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    @SneakyThrows
-    public void createPerson(PersonRequestDto personDto) {
+    public void createPerson(PersonRequestDto personDto) throws PersonExistsException, PersonNotFoundException {
         LOG.info("Creating person with name {}", personDto.getName());
 
         Optional<Person> personOptional = personRepository.findByCountryCodeAndIdCode(personDto.getCountryCode(), personDto.getIdCode());
@@ -198,10 +197,10 @@ public class PersonServiceImpl implements PersonService {
         Optional<Person> personOptional = personRepository.findByCountryCodeAndIdCode(countryCode, idCode);
 
         if (personOptional.isEmpty()) {
-            throw new PersonNotFoundException("Can't find the person from db to delete it.");
+            throw new PersonNotFoundException("Can't find the person from db to tell his position in family");
         }
 
-        return Stream.concat(
+        return Stream.concat( // Get position in siblings by age
                 personOptional.get().getParents().stream()
                         .map(Person::getChildren).flatMap(Collection::stream), Stream.of(personOptional.get()))
                 .collect(Collectors.toSet()).stream()
@@ -216,8 +215,8 @@ public class PersonServiceImpl implements PersonService {
         return personRepository.findTop500ByOrderByIdDesc().stream()
                 .map(Person::fillPostTransactionFields)
                 .filter(PersonUtils::isPotentialUncleOrAunt)
-                .map(x -> standardisePerson(x, 1))
-                .min(Comparator.comparingInt(Person::getAge));
+                .map(x -> standardisePerson(x, 1)) // fill age if possible
+                .min(Comparator.comparingInt(Person::getAge)); // get youngest
 
     }
 

@@ -48,20 +48,20 @@ public class Person {
     private String idCode;
 
     @Builder.Default
-    @ManyToMany(cascade = CascadeType.DETACH)
+    @ManyToMany(cascade = CascadeType.DETACH) // Every modification must be made manually. Otherwise it cascades badly.
     private List<Person> parents = new ArrayList<>();
 
     @Builder.Default
-    @ManyToMany(cascade = CascadeType.DETACH)
+    @ManyToMany(cascade = CascadeType.DETACH) // Every modification must be made manually. Otherwise it cascades badly.
     private List<Person> children = new ArrayList<>();
 
     @NotEmpty(message = "Name is needed")
     @Size(min = 5)
     private String name;
 
-    private Date birthDate; // Epoch time constructor
+    private Date birthDate; // Epoch time constructor or datetime constructor
 
-    private Date deathDate; // Epoch time constructor
+    private Date deathDate; // Epoch time constructor or datetime constructor
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @Transient
@@ -92,7 +92,7 @@ public class Person {
     }
 
     @SneakyThrows
-    private void businessRuleCheck() {
+    private void businessRuleCheck() { // Validate again in backend
         if (cut) {
             throw new PersonIsCutException("Cant save a cut person.");
         }
@@ -112,7 +112,7 @@ public class Person {
         }
     }
 
-    private void validationRuleCheck() throws PersonValidationException {
+    private void validationRuleCheck() throws PersonValidationException { // Validate again in backend
 
         if (!this.getName().matches(NAME_CHECK)) {
             throw new PersonValidationException(String.format("%s should match regex %s", this.getName(), NAME_CHECK));
@@ -128,7 +128,7 @@ public class Person {
     }
 
     @PreRemove
-    private void preRemove() {
+    private void preRemove() { // Detach person from other people
         for (Person p : this.getParents()) {
             p.getChildren().remove(this);
         }
@@ -138,7 +138,7 @@ public class Person {
         }
     }
 
-    public Person fillPostTransactionFields() {
+    public Person fillPostTransactionFields() { // Post transactional fields
         age = getCalculatedAge();
         return this;
     }
@@ -153,6 +153,8 @@ public class Person {
             return -1; // can't calculate age
         }
     }
+
+    //////////////////////// UNUSED ATM //////////////////////////////
 
     public Boolean isSibling(Person sibling) {
         return parents.containsAll(sibling.getParents()) && sibling.getParents().containsAll(parents);

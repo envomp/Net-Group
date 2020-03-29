@@ -8,5 +8,5 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 public class ApplicationProperties {
-    public static Integer maxDepth = 10; // Total dockers running same time
+    public static Integer maxDepth = 10; // Max recursion depth
 }

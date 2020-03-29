@@ -15,7 +15,7 @@ public class CorsConfiguration {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins(
-                                "*" // allow all
+                                "*" // allow all. Add JWT when logging in is needed. Out of the scope ATM
                         ).allowedMethods("PUT", "DELETE", "GET", "POST")
                         .allowCredentials(true);
             }
