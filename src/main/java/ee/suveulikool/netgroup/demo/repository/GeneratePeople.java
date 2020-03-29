@@ -109,7 +109,6 @@ public class GeneratePeople {
         father.getChildren().addAll(new ArrayList<>(List.of(child, sister)));
         mother.getParents().add(grand_mother);
         aunt.getParents().add(grand_mother);
-        father.getChildren().add(child);
         child.getParents().addAll(new ArrayList<>(List.of(father, mother)));
         sister.getParents().addAll(new ArrayList<>(List.of(father, mother)));
         half_sister.getParents().addAll(new ArrayList<>(List.of(mother)));

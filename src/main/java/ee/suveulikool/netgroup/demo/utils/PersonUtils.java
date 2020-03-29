@@ -4,11 +4,12 @@ import ee.suveulikool.netgroup.demo.domain.Person;
 import ee.suveulikool.netgroup.demo.domain.QueuePerson;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class PersonUtils {
 
-    public static void generateTreeWithPersonAsRoot(Person person, int depth) {
+    public static void generateGraphWithPersonAsRoot(Person person, int depth) {
         LinkedList<QueuePerson> queue = new LinkedList<>();
         queue.add(QueuePerson.builder().depth(depth).person(person).build());
         modifyOrigin(person);
@@ -41,11 +42,39 @@ public class PersonUtils {
                 }
 
             } else { // break condition when depth was reached. Construct a leaf.
-                origin.getPerson().setParents(new ArrayList<>());
-                origin.getPerson().setChildren(new ArrayList<>());
+                Person finalOrigin = origin.getPerson();
+                leafify(finalOrigin);
             }
         }
     }
+
+    private static void leafify(Person finalOrigin) {
+        finalOrigin.getParents().stream().filter(x -> !x.isCut())
+                .forEach(x -> x.getChildren().remove(finalOrigin));
+        finalOrigin.setParents(new ArrayList<>());
+        finalOrigin.getChildren().stream().filter(x -> !x.isCut())
+                .forEach(x -> x.getParents().remove(finalOrigin));
+        finalOrigin.setChildren(new ArrayList<>());
+    }
+
+    public static void generateTreeWithPersonAsRoot(Person person, int depth) {
+        if (depth == 0) {
+            leafify(person);
+            return;
+        }
+        for (Person parent : person.getParents()) {
+            generateTreeWithPersonAsRoot(parent, depth - 1);
+            for (Person child : parent.getChildren()) {
+                if (person != child) {
+                    child.setCut(true);
+                    child.getParents().remove(parent);
+                }
+            }
+            parent.setCut(true);
+            parent.setChildren(new ArrayList<>());
+        }
+    }
+
 
     private static void modifyOrigin(Person origin) {
         origin.setCut(true);
@@ -57,6 +86,21 @@ public class PersonUtils {
         for (Person child : origin.getChildren()) { // Remove lower inbound links
             child.getParents().remove(origin);
         }
+    }
+
+    public static Integer getNumberOfAncestor(Person root, int depth) {
+        if (depth == 0) { // depth too big. Giving up
+            return 1;
+        }
+
+        int cur = 1;
+
+        for (Person parent : root.getParents()) {  // expand up
+//            System.out.println("parent " + parent.getName() + getNumberOfAncestor(parent, depth - 1));
+            cur += getNumberOfAncestor(parent, depth - 1);
+        }
+
+        return cur; // Tree was searched.
     }
 
     public static Boolean isAncestor(Person target, Person root, int depth) {

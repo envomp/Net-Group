@@ -31,6 +31,12 @@ public class PersonController {
     }
 
     @ResponseStatus(HttpStatus.OK)
+    @GetMapping(path = "/tree/{countryCode}/{idCode}")
+    public Optional<Person> getPersonTree(@PathVariable String countryCode, @PathVariable String idCode) {
+        return personService.getPersonByCountryCodeAndIDCodeAsTree(countryCode, idCode);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping(path = "/{countryCode}/{idCode}")
     public Optional<Person> getPerson(@PathVariable String countryCode, @PathVariable String idCode) {
         return personService.getPersonByCountryCodeAndIDCode(countryCode, idCode);
@@ -44,9 +50,9 @@ public class PersonController {
 
 
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping(path = "")
-    public void updatePerson(@RequestBody PersonRequestDto requestDto) throws PersonNotFoundException, PersonExistsException, PersonValidationException {
-        personService.updatePerson(requestDto);
+    @PutMapping(path = "/{countryCode}/{idCode}")
+    public void updatePerson(@PathVariable String countryCode, @PathVariable String idCode, @RequestBody PersonRequestDto requestDto) throws PersonNotFoundException, PersonExistsException, PersonValidationException {
+        personService.updatePerson(countryCode, idCode, requestDto);
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -59,6 +65,12 @@ public class PersonController {
     @DeleteMapping(path = "/{countryCode}/{idCode}")
     public void deletePerson(@PathVariable String countryCode, @PathVariable String idCode) throws PersonNotFoundException {
         personService.deletePersonByCountryCodeAndIDCode(countryCode, idCode);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping(path = "/position/{countryCode}/{idCode}")
+    public Integer getPersonsPositionInFamily(@PathVariable String countryCode, @PathVariable String idCode) throws PersonNotFoundException {
+        return personService.getPersonPositionInFamily(countryCode, idCode);
     }
 
 }

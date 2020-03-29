@@ -3,13 +3,12 @@ package ee.suveulikool.netgroup.demo.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import ee.suveulikool.netgroup.demo.configuration.ApplicationProperties;
 import ee.suveulikool.netgroup.demo.exception.PersonIsCutException;
 import ee.suveulikool.netgroup.demo.exception.PersonValidationException;
 import ee.suveulikool.netgroup.demo.utils.PersonUtils;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -67,7 +66,9 @@ public class Person {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @Transient
-    private Integer age = this.getCalculatedAge();
+    private Integer age;
+
+    private Integer ancestors;
 
     @NotEmpty(message = "Gender is needed")
     private Gender gender;
@@ -82,25 +83,23 @@ public class Person {
     @Builder.Default
     private boolean cut = false; // Once the graph is cut to a tree, no saving is possible. Also a marker for cutting the graph.
 
+    @SneakyThrows
     @PrePersist
-    private void preInsert() throws PersonValidationException, PersonIsCutException {
-        businessRuleCheck();
-        validationRuleCheck();
-    }
-
     @PreUpdate
-    private void preUpdate() throws PersonIsCutException, PersonValidationException {
+    public void preTransaction() {
         businessRuleCheck();
         validationRuleCheck();
+        ancestors = PersonUtils.getNumberOfAncestor(this, ApplicationProperties.maxDepth);
     }
 
-    private void businessRuleCheck() throws PersonIsCutException, PersonValidationException {
+    @SneakyThrows
+    private void businessRuleCheck() {
         if (cut) {
             throw new PersonIsCutException("Cant save a cut person.");
         }
 
         for (Person parent : parents) { // Date check
-            if (parent.getBirthDate() == null || this.getBirthDate().before(parent.getBirthDate())) {
+            if (getBirthDate() != null && parent.getBirthDate() != null && this.getBirthDate().before(parent.getBirthDate())) {
                 throw new PersonValidationException(String.format("%s should be born after his/her/it's parent %s", this.getName(), parent.getName()));
             }
         }

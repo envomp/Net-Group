@@ -6,7 +6,6 @@ import ee.suveulikool.netgroup.demo.exception.PersonExistsException;
 import ee.suveulikool.netgroup.demo.exception.PersonIsCutException;
 import ee.suveulikool.netgroup.demo.exception.PersonNotFoundException;
 import ee.suveulikool.netgroup.demo.exception.PersonValidationException;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +26,11 @@ public interface PersonService {
 
     Optional<Person> getPersonByCountryCodeAndIDCode(String county_code, String id_code);
 
+    Optional<Person> getPersonByCountryCodeAndIDCodeAsTree(String countryCode, String idCode);
+
     void updatePerson(Person person) throws PersonIsCutException, PersonNotFoundException, PersonValidationException;
 
-    void updatePerson(PersonRequestDto person) throws PersonExistsException, PersonNotFoundException, PersonValidationException;
+    void updatePerson(String countryCode, String idCode, PersonRequestDto person) throws PersonExistsException, PersonNotFoundException, PersonValidationException;
 
     void createPerson(Person person) throws PersonIsCutException, PersonExistsException, PersonValidationException;
 
@@ -39,6 +40,6 @@ public interface PersonService {
 
     void deletePersonByCountryCodeAndIDCode(String countryCode, String idCode) throws PersonNotFoundException;
 
-
+    Integer getPersonPositionInFamily(String countryCode, String idCode) throws PersonNotFoundException;
 
 }

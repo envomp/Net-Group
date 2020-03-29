@@ -119,7 +119,7 @@ public class PersonControllerTests {
                 .when()
                 .body(person)
                 .contentType("application/json")
-                .put("api/v1/person")
+                .put("api/v1/person/" + person.getCountryCode() + "/" + person.getIdCode())
                 .then()
                 .statusCode(is(HttpStatus.SC_OK));
 
