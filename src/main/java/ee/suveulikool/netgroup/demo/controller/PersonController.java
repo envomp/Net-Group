@@ -73,4 +73,10 @@ public class PersonController {
         return personService.getPersonPositionInFamily(countryCode, idCode);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping(path = "/youngest/auntOrUncle")
+    public Optional<Person> getYoungestAuntOrUncle() {
+        return personService.getYoungestAuntOrUncle();
+    }
+
 }

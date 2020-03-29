@@ -8,7 +8,6 @@ import ee.suveulikool.netgroup.demo.exception.PersonIsCutException;
 import ee.suveulikool.netgroup.demo.exception.PersonValidationException;
 import ee.suveulikool.netgroup.demo.utils.PersonUtils;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -89,7 +88,7 @@ public class Person {
     public void preTransaction() {
         businessRuleCheck();
         validationRuleCheck();
-        ancestors = PersonUtils.getNumberOfAncestor(this, ApplicationProperties.maxDepth);
+        ancestors = PersonUtils.getNumberOfAncestor(this, ApplicationProperties.maxDepth) - 1;
     }
 
     @SneakyThrows
@@ -139,8 +138,9 @@ public class Person {
         }
     }
 
-    public void fillPostTransactionFields() {
+    public Person fillPostTransactionFields() {
         age = getCalculatedAge();
+        return this;
     }
 
     private Integer getCalculatedAge() {

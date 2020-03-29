@@ -210,6 +210,17 @@ public class PersonServiceImpl implements PersonService {
 
     }
 
+    @Override
+    public Optional<Person> getYoungestAuntOrUncle() {
+
+        return personRepository.findTop500ByOrderByIdDesc().stream()
+                .map(Person::fillPostTransactionFields)
+                .filter(PersonUtils::isPotentialUncleOrAunt)
+                .map(x -> standardisePerson(x, 1))
+                .min(Comparator.comparingInt(Person::getAge));
+
+    }
+
     private void fillChildrenAndParents(PersonRequestDto personDto, Person person) throws PersonNotFoundException {
         if (personDto.getChildren() != null) {
 

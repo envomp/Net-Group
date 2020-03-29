@@ -4,7 +4,6 @@ import ee.suveulikool.netgroup.demo.domain.Person;
 import ee.suveulikool.netgroup.demo.domain.QueuePerson;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 
 public class PersonUtils {
@@ -174,6 +173,18 @@ public class PersonUtils {
 
         root.setCut(false); // inplace modification. Graph will be left unharmed
         return answer;
+    }
+
+    public static Boolean isPotentialUncleOrAunt(Person person) {
+        for (Person parent : person.getParents()) {
+            for (Person child : parent.getChildren()) {
+                for (Person grand : child.getChildren()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 }

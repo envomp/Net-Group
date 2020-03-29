@@ -42,4 +42,5 @@ public interface PersonService {
 
     Integer getPersonPositionInFamily(String countryCode, String idCode) throws PersonNotFoundException;
 
+    Optional<Person> getYoungestAuntOrUncle();
 }
